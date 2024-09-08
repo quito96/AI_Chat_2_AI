@@ -1,63 +1,75 @@
-# AI Chat 2 AI
+# AI Multi-Model Discussion System
 
-## Project Overview
-
-AI Chat 2 AI is an innovative project that facilitates a structured conversation between two AI models (ChatGPT and Claude) on a given topic. The project uses the CrewAI framework to manage the interaction between the AI agents and generate a comprehensive summary of the discussion.
+## Overview
+This project implements an AI-driven discussion system that allows multiple language models to engage in a conversation on a given topic. It supports the use of OpenAI's ChatGPT, Anthropic's Claude, and Google's Gemini (optional) to create dynamic, multi-perspective discussions.
 
 ## Features
-
-- Dynamic conversation between two AI models (ChatGPT and Claude)
+- Supports multiple AI models: ChatGPT, Claude, and Gemini (optional)
 - User-defined discussion topics
-- Structured turn-based dialogue
-- Comprehensive summary generation
 - Configurable number of conversation turns
+- Automatic summary generation of the discussion
+- Flexible model selection for each discussion
 
-## Components
-
-1. **main.py**: The main script that orchestrates the conversation and summary generation.
-2. **agents.py**: Defines the AI agents (ChatGPT and Claude) using the CrewAI framework.
-3. **tasks.py**: Contains task definitions for the discussion and summary generation.
-4. **utils.py**: Utility functions for formatting the conversation.
-5. **config.py**: Configuration settings including API keys and conversation parameters.
-
-## How It Works
-
-1. The user inputs a discussion topic.
-2. The program initiates a turn-based conversation between ChatGPT and Claude on the given topic.
-3. Each AI agent responds to the other's previous statement, addressing them by name.
-4. After the specified number of turns, the conversation is concluded.
-5. A summary of the entire discussion is generated, highlighting key points and conclusions.
-
-## Key Features
-
-- **Dynamic Interaction**: The AI agents engage in a back-and-forth dialogue, building upon each other's responses.
-- **Personalized Responses**: Agents address each other by name, creating a more natural conversation flow.
-- **Structured Summary**: The final summary provides a concise overview of the main points discussed and the conclusions reached.
-- **Flexibility**: The system can handle various discussion topics, making it versatile for different use cases.
-
-## Configuration
-
-- The number of conversation turns can be adjusted in the `config.py` file.
-- API keys for OpenAI (ChatGPT) and Anthropic (Claude) should be set in a `.env` file.
-
-## Requirements
-
-- Python 3.x
-- CrewAI library
+## Prerequisites
+- Python 3.8+
 - OpenAI API key
 - Anthropic API key
+- Google Gemini credentials (optional)
+
+## Installation
+1. Clone the repository:
+
+```bash
+git clone https://github.com/quito96/Al_Chat_2_Al.git
+cd Al_Chat_2_Al
+```
+
+2. Install required packages:
+
+```bash
+pip install -r requirements.txt
+```
+3. Set up environment variables:
+Create a `.env` file in the project root and add your API keys:
+
+```txt
+OPENAI_API_KEY=your_openai_api_key
+ANTHROPIC_API_KEY=your_anthropic_api_key
+GOOGLE_CREDENTIALS_PATH="path2credendials **.json"
+```
+
+4. (Optional) For Google Gemini:
+Place your Gemini credentials JSON file in the project directory and update the path in `config.py`.
 
 ## Usage
+Run the main.py script. 
 
-1. Set up the required API keys in a `.env` file.
-2. Run `main.py`.
-3. Enter a discussion topic when prompted.
-4. The program will generate the conversation and summary automatically.
+Follow the prompts to enter a discussion topic and select the AI models you want to use for the conversation.
 
-## Future Improvements
+## Project Structure
+- `main.py`: Main script to run the discussion system
+- `agents.py`: Defines AI agents (ChatGPT, Claude, Gemini)
+- `tasks.py`: Defines discussion and summary tasks
+- `utils.py`: Utility functions for formatting conversations
+- `config.py`: Configuration settings and API key management
 
-- Implement more diverse AI models for multi-agent discussions.
-- Add support for saving conversations and summaries to files.
-- Develop a user interface for easier interaction and visualization of the conversation.
+## Configuration
+- Adjust `MAX_TURNS` in `config.py` to change the number of conversation turns
+- Modify `MAX_TOKENS` in `config.py` to adjust the maximum length of model responses
 
-This project demonstrates the potential of AI-to-AI interactions in generating insightful discussions and summaries on various topics, showcasing the capabilities of large language models in structured dialogue scenarios.
+## Contributing
+Contributions to improve the project are welcome. Please follow these steps:
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+This project is licensed under the MIT License - see the `LICENSE` file for details.
+
+## Acknowledgments
+- OpenAI for the ChatGPT API
+- Anthropic for the Claude API
+- Google for the Gemini API (if implemented)
+- The CrewAI library for agent orchestration

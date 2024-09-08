@@ -1,18 +1,27 @@
-#config.py
+# config.py
 import os
+import json
 from dotenv import load_dotenv
 
-# Laden der Umgebungsvariablen aus der .env-Datei
+# Loading the environment variables from the .env file
 load_dotenv()
 
 # API Keys
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 
-# Überprüfen, ob die API-Schlüssel geladen wurden
+# Check if the API keys have been loaded
 if not OPENAI_API_KEY or not ANTHROPIC_API_KEY:
     raise ValueError("API keys not found. Please check your .env file.")
 
-# Konfigurationseinstellungen
-MAX_TURNS = 5  # Maximale Anzahl der Gesprächsrunden
-MAX_TOKENS = 1000  # Maximale Tokenzahl pro Antwort
+# Loading the Google Gemini Credentials from the JSON file
+GOOGLE_CREDENTIALS_PATH = os.getenv("GOOGLE_CREDENTIALS_PATH")
+with open(GOOGLE_CREDENTIALS_PATH) as f:
+    GOOGLE_CREDENTIALS = json.load(f)
+
+# Configuration settings
+MAX_TURNS = 5  # Maximum number of conversation rounds
+MAX_TOKENS = 1000  # Maximum number of tokens per response
+
+# List of available models
+AVAILABLE_MODELS = ["chatgpt", "claude", "gemini"]
