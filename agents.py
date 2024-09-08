@@ -41,7 +41,7 @@ gemini_agent = Agent(
     allow_delegation=False,
     llm_config={
         "provider": "google",
-        "model": "gemini-pro",
+        "model": "gemini-1.5-flash",  # gemini-1.5-flash, gemini-pro
         "credentials": GOOGLE_CREDENTIALS,
         "temperature": 0.7,
         "max_tokens": MAX_TOKENS

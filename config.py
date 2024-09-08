@@ -21,7 +21,7 @@ with open(GOOGLE_CREDENTIALS_PATH) as f:
 
 # Configuration settings
 MAX_TURNS = 5  # Maximum number of conversation rounds
-MAX_TOKENS = 1000  # Maximum number of tokens per response
+MAX_TOKENS = 2000  # Maximum number of tokens per response
 
 # List of available models
 AVAILABLE_MODELS = ["chatgpt", "claude", "gemini"]
