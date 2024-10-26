@@ -9,6 +9,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+
+
 def main():
     topic = input("Enter the discussion topic: ")
 

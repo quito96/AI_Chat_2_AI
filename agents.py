@@ -1,6 +1,17 @@
-#agents.py
-from crewai import Agent
-from config import OPENAI_API_KEY, ANTHROPIC_API_KEY,GOOGLE_CREDENTIALS,MAX_TOKENS
+# agents.py
+from crewai import Agent,LLM
+from config import OPENAI_API_KEY, ANTHROPIC_API_KEY, GOOGLE_CREDENTIALS, MAX_TOKENS
+
+
+### language:python
+granite_agent = Agent(
+    role='Granite',
+    goal='Participate in a constructive dialogue and offer unique perspectives.',
+    backstory="You are Granite, an AI assistant created by IBM.",
+    verbose=True,
+    allow_delegation=False,
+    llm=LLM(model="ollama/granite3-dense:8b", base_url="http://localhost:11434")
+    )
 
 chatgpt_agent = Agent(
     role='ChatGPT',
@@ -32,7 +43,6 @@ claude_agent = Agent(
     }
 )
 
-
 gemini_agent = Agent(
     role='Gemini',
     goal='Engage in an insightful discussion and provide unique perspectives.',
@@ -48,10 +58,10 @@ gemini_agent = Agent(
     }
 )
 
-
 # Dictionary to easily access agents by name
 agent_dict = {
     "chatgpt": chatgpt_agent,
     "claude": claude_agent,
-    "gemini": gemini_agent
+    "gemini": gemini_agent,
+    "granite": granite_agent
 }
