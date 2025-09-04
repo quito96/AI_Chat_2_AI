@@ -4,11 +4,15 @@
 This project implements an AI-driven discussion system that allows multiple language models to engage in a conversation on a given topic. It supports the use of OpenAI's ChatGPT, Anthropic's Claude, and Google's Gemini (optional) to create dynamic, multi-perspective discussions.
 
 ## Features
-- Supports multiple AI models: ChatGPT, Claude, and Gemini (optional)
-- User-defined discussion topics
-- Configurable number of conversation turns
-- Automatic summary generation of the discussion
-- Flexible model selection for each discussion
+- **Multiple AI Models**: ChatGPT, Claude, Gemini (optional), and Granite
+- **Dual Interface**: Command-line (main.py) and Web UI (Streamlit app)
+- **Interactive Web Interface**: Real-time discussion tracking with modern UI
+- **User-defined Topics**: Custom discussion topics or predefined templates
+- **Configurable Settings**: Adjustable conversation turns and model parameters
+- **Live Updates**: Watch discussions unfold in real-time (with streaming option)
+- **Export Functions**: Download results as Markdown or PDF
+- **Discussion History**: Save and reload previous discussions
+- **Automatic Summary**: AI-generated summaries of discussions
 
 ## Prerequisites
 - Python 3.11+ (automatically managed by uv)
@@ -54,27 +58,54 @@ GOOGLE_CREDENTIALS_PATH="path2credendials **.json"
 Place your Gemini credentials JSON file in the project directory and update the path in `config.py`.
 
 ## Usage
-Run the main script using uv:
+
+### 🖥️ Web Interface (Recommended)
+Start the interactive Streamlit web application:
+
+**Option 1: Using the start script (easiest)**
+```bash
+./start_app.sh
+```
+
+**Option 2: Direct command**
+```bash
+uv run streamlit run app.py
+```
+
+The app will be available at: **http://localhost:8588**
+
+**Features of the Web Interface:**
+- 🎨 **Modern Dark Theme**: Eye-friendly dark interface
+- 📊 **Live Progress Tracking**: Watch discussions unfold in real-time
+- 🔄 **Streaming Mode**: See responses word-by-word or in blocks
+- 📚 **Discussion Templates**: Pre-defined topics or custom input
+- 💾 **Export Options**: Download as Markdown or PDF
+- 📜 **History Management**: Save and reload discussions
+- ⚙️ **Easy Configuration**: Visual model selection and settings
+
+### 💻 Command Line Interface
+For advanced users or automation:
 
 ```bash
 uv run python main.py
 ```
 
-Follow the prompts to enter a discussion topic and select the AI models you want to use for the conversation.
-
-### Available Commands
-- Run the main discussion system: `uv run python main.py`
+### 🔧 Utility Commands
 - Check available Anthropic models: `uv run python utils/get_anthropic_models.py`
 - Check available OpenAI models: `uv run python utils/get_openai_models.py`
 
 ## Project Structure
-- `main.py`: Main script to run the discussion system
-- `agents.py`: Defines AI agents (ChatGPT, Claude, Gemini, Granite)
-- `tasks.py`: Defines discussion and summary tasks
-- `utils.py`: Utility functions for formatting conversations
+- `app.py`: **🆕 Streamlit web application** (main interface)
+- `streamlit_utils.py`: **🆕 Streamlit-specific utilities and helpers**
+- `main.py`: Command-line interface (CLI)
+- `agents.py`: AI agent definitions (ChatGPT, Claude, Gemini, Granite)
+- `tasks.py`: Discussion and summary task definitions
+- `utils.py`: Core utility functions for conversation formatting
 - `config.py`: Configuration settings and API key management
-- `pyproject.toml`: Project configuration and dependencies (uv/pip compatible)
-- `utils/`: Additional utility scripts for model information
+- `pyproject.toml`: Modern project configuration and dependencies
+- `.streamlit/`: **🆕 Streamlit configuration**
+  - `config.toml`: App settings (dark theme, port 8588)
+- `utils/`: Additional utility scripts
   - `get_anthropic_models.py`: Fetch available Anthropic models
   - `get_openai_models.py`: Fetch available OpenAI models
 
@@ -85,10 +116,20 @@ Follow the prompts to enter a discussion topic and select the AI models you want
 - Dependencies are managed in `pyproject.toml`
 
 ### Supported AI Models
-- **ChatGPT**: OpenAI GPT-4o (configurable)
-- **Claude**: Anthropic Claude Opus 4 (configurable) 
-- **Gemini**: Google Gemini 1.5 Flash (optional, requires credentials)
-- **Granite**: IBM Granite 3 Dense 8B (via Ollama, local)
+- **ChatGPT**: OpenAI GPT-4o (configurable) 🤖
+- **Claude**: Anthropic Claude Opus 4 (configurable) 🧠
+- **Gemini**: Google Gemini 1.5 Flash (optional, requires credentials) 💎
+- **Granite**: IBM Granite 3 Dense 8B (via Ollama, local) 🗿
+
+### Web Interface Features
+- **🎨 Dark Theme**: Professional dark interface optimized for long discussions
+- **📊 Real-time Progress**: Live updates during AI conversations
+- **🔄 Streaming Options**: Choose between instant blocks or word-by-word streaming
+- **📋 Discussion Templates**: 8+ pre-defined topics covering AI, climate, education, etc.
+- **💾 Export Functions**: Download discussions as Markdown or PDF
+- **📚 Session History**: Automatically save and reload previous discussions
+- **⚙️ Visual Configuration**: Easy model selection and parameter adjustment
+- **📡 API Status Monitoring**: Real-time status of all AI services
 
 ## Contributing
 Contributions to improve the project are welcome. Please follow these steps:
