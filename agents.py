@@ -21,7 +21,7 @@ chatgpt_agent = Agent(
     allow_delegation=False,
     llm_config={
         "provider": "openai",
-        "model": "gpt-4o",
+        "model": "gpt-5", #gpt-4o
         "api_key": OPENAI_API_KEY,
         "temperature": 0.7,
         "max_tokens": MAX_TOKENS
@@ -36,7 +36,7 @@ claude_agent = Agent(
     allow_delegation=False,
     llm_config={
         "provider": "anthropic",
-        "model": "claude-3-5-sonnet-20240620",
+        "model": "claude-opus-4-20250514",
         "api_key": ANTHROPIC_API_KEY,
         "temperature": 0.7,
         "max_tokens": MAX_TOKENS
