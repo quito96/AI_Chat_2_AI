@@ -43,25 +43,31 @@ claude_agent = Agent(
     }
 )
 
-gemini_agent = Agent(
-    role='Gemini',
-    goal='Engage in an insightful discussion and provide unique perspectives.',
-    backstory="You are Gemini, an AI model developed by Google.",
-    verbose=True,
-    allow_delegation=False,
-    llm_config={
-        "provider": "google",
-        "model": "gemini-1.5-flash",  # gemini-1.5-flash, gemini-pro
-        "credentials": GOOGLE_CREDENTIALS,
-        "temperature": 0.7,
-        "max_tokens": MAX_TOKENS
-    }
-)
+# Gemini agent - only create if credentials are available
+gemini_agent = None
+if GOOGLE_CREDENTIALS:
+    gemini_agent = Agent(
+        role='Gemini',
+        goal='Engage in an insightful discussion and provide unique perspectives.',
+        backstory="You are Gemini, an AI model developed by Google.",
+        verbose=True,
+        allow_delegation=False,
+        llm_config={
+            "provider": "google",
+            "model": "gemini-1.5-flash",  # gemini-1.5-flash, gemini-pro
+            "credentials": GOOGLE_CREDENTIALS,
+            "temperature": 0.7,
+            "max_tokens": MAX_TOKENS
+        }
+    )
 
 # Dictionary to easily access agents by name
 agent_dict = {
     "chatgpt": chatgpt_agent,
     "claude": claude_agent,
-    "gemini": gemini_agent,
     "granite": granite_agent
 }
+
+# Add Gemini only if available
+if gemini_agent:
+    agent_dict["gemini"] = gemini_agent
