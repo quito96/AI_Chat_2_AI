@@ -364,21 +364,30 @@ def sync_session_to_database():
 
 def load_database_to_session(limit: Optional[int] = 10):
     """Lädt Diskussionen aus der Datenbank in den Session State"""
-    db = get_database()
-    db_discussions = db.load_all_discussions(limit)
-    
-    # Konvertiere zu Session State Format
-    session_discussions = []
-    for disc in db_discussions:
-        full_disc = db.load_discussion_with_messages(disc['id'])
-        if full_disc:
-            session_discussions.append({
-                'db_id': full_disc['id'],
-                'timestamp': full_disc['timestamp'],
-                'topic': full_disc['topic'],
-                'models': full_disc['models'],
-                'conversation': full_disc['conversation'],
-                'summary': full_disc['summary']
-            })
-    
-    st.session_state.discussion_history = session_discussions
+    try:
+        db = get_database()
+        db_discussions = db.load_all_discussions(limit)
+        
+        # Konvertiere zu Session State Format
+        session_discussions = []
+        for disc in db_discussions:
+            full_disc = db.load_discussion_with_messages(disc['id'])
+            if full_disc:
+                session_discussions.append({
+                    'db_id': full_disc['id'],
+                    'timestamp': full_disc['timestamp'],
+                    'topic': full_disc['topic'],
+                    'models': full_disc['models'],
+                    'conversation': full_disc['conversation'],
+                    'summary': full_disc['summary']
+                })
+        
+        # Session State setzen
+        if 'discussion_history' not in st.session_state:
+            st.session_state.discussion_history = []
+        st.session_state.discussion_history = session_discussions
+        
+    except Exception as e:
+        print(f"❌ Fehler beim Laden der Diskussionen: {e}")
+        if 'discussion_history' not in st.session_state:
+            st.session_state.discussion_history = []

@@ -88,69 +88,40 @@ def main():
             help="Zeigt alle Diskussionsrunden an"
         )
     
-    # Hauptbereich
-    col1, col2 = st.columns([2, 1])
+    # Hauptbereich - Fokussiert auf das Wesentliche
+    # Themen-Eingabe
+    st.subheader("💭 Diskussionsthema")
     
-    with col1:
-        # Themen-Eingabe
-        st.subheader("💭 Diskussionsthema")
-        
-        # Template-Auswahl
-        templates = get_discussion_templates()
-        template_choice = st.selectbox(
-            "Vordefinierte Themen:",
-            ["Eigenes Thema eingeben"] + list(templates.keys()),
-            help="Wählen Sie ein Template oder geben Sie ein eigenes Thema ein"
+    # Template-Auswahl
+    templates = get_discussion_templates()
+    template_choice = st.selectbox(
+        "Vordefinierte Themen:",
+        ["Eigenes Thema eingeben"] + list(templates.keys()),
+        help="Wählen Sie ein Template oder geben Sie ein eigenes Thema ein"
+    )
+    
+    if template_choice == "Eigenes Thema eingeben":
+        topic = st.text_area(
+            "Ihr Diskussionsthema:",
+            placeholder="Geben Sie hier Ihr Diskussionsthema ein...",
+            height=100
         )
-        
-        if template_choice == "Eigenes Thema eingeben":
-            topic = st.text_area(
-                "Ihr Diskussionsthema:",
-                placeholder="Geben Sie hier Ihr Diskussionsthema ein...",
-                height=100
-            )
-        else:
-            topic = st.text_area(
-                "Diskussionsthema (bearbeitbar):",
-                value=templates[template_choice],
-                height=100
-            )
-        
-        # Start Button
+    else:
+        topic = st.text_area(
+            "Diskussionsthema (bearbeitbar):",
+            value=templates[template_choice],
+            height=100
+        )
+    
+    # Start Button - zentriert und prominent
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
         start_discussion = st.button(
             "🚀 Diskussion starten",
             type="primary",
             disabled=not topic or len(selected_models) < 2,
             use_container_width=True
         )
-    
-    with col2:
-        # API Status
-        st.subheader("🔗 API Status")
-        api_status = check_api_status()
-        
-        for model, status in api_status.items():
-            if status:
-                st.success(f"✅ {model.title()} verfügbar")
-            else:
-                st.error(f"❌ {model.title()} nicht verfügbar")
-        
-        # Schnelle Historie-Übersicht (falls Diskussionen vorhanden)
-        history = load_discussion_history()
-        if history:
-            with st.expander(f"📜 Letzte Diskussionen ({len(history)} gespeichert)", expanded=False):
-                # Nur die letzten 3 anzeigen
-                for i, entry in enumerate(reversed(history[-3:])):
-                    topic_preview = entry['topic'][:35] + "..." if len(entry['topic']) > 35 else entry['topic']
-                    date_str = entry['timestamp'][:16].replace('T', ' ')
-                    
-                    col1, col2 = st.columns([4, 1])
-                    with col1:
-                        st.caption(f"💬 {topic_preview} - {date_str}")
-                    with col2:
-                        if st.button(f"📖", key=f"quick_load_{i}", help="Diskussion laden", use_container_width=True):
-                            st.session_state.loaded_discussion = entry
-                            st.rerun()
     
     # Diskussion ausführen
     if start_discussion:
