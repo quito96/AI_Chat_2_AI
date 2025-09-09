@@ -139,23 +139,38 @@ def main():
                 
                 # Letzte Diskussionen anzeigen
                 for i, entry in enumerate(reversed(history[-5:])):  # Letzte 5
-                    with st.expander(f"💬 {entry['topic'][:40]}..."):
-                        st.write(f"**Datum:** {entry['timestamp'][:19]}")
-                        st.write(f"**Modelle:** {', '.join(entry['models'])}")
+                    # Erweiterte Anzeige mit mehr Informationen
+                    topic_preview = entry['topic'][:50] + "..." if len(entry['topic']) > 50 else entry['topic']
+                    date_str = entry['timestamp'][:19].replace('T', ' ')
+                    models_str = ', '.join(entry['models'])
+                    
+                    with st.expander(f"💬 {topic_preview}", expanded=False):
+                        st.write(f"**📅 Datum:** {date_str}")
+                        st.write(f"**🤖 Modelle:** {models_str}")
+                        st.write(f"**🔢 DB-ID:** {entry.get('db_id', 'Nicht verfügbar')}")
                         
-                        col_load, col_delete = st.columns([2, 1])
-                        with col_load:
-                            if st.button(f"📖 Laden", key=f"load_{i}"):
+                        # Buttons in separaten Spalten
+                        col1, col2, col3 = st.columns([2, 1, 1])
+                        
+                        with col1:
+                            if st.button(f"📖 Laden", key=f"load_hist_{i}", use_container_width=True):
                                 st.session_state.loaded_discussion = entry
+                                st.success(f"Diskussion '{entry['topic'][:30]}...' geladen!")
                                 st.rerun()
                         
-                        with col_delete:
-                            if st.button(f"🗑️ Löschen", key=f"delete_{i}", type="secondary"):
-                                if delete_discussion(entry.get('db_id', 0)):
+                        with col2:
+                            if st.button(f"🗑️ Löschen", key=f"delete_hist_{i}", type="secondary", use_container_width=True):
+                                db_id = entry.get('db_id', 0)
+                                if db_id and delete_discussion(db_id):
                                     st.success("Diskussion gelöscht!")
                                     st.rerun()
                                 else:
                                     st.error("Fehler beim Löschen!")
+                        
+                        with col3:
+                            # Info-Button für Details
+                            if st.button(f"ℹ️ Info", key=f"info_hist_{i}", use_container_width=True):
+                                st.info(f"**Diskussion Details:**\n- Turns: {len(entry.get('conversation', []))}\n- Zusammenfassung: {entry.get('summary', 'Keine')[:100]}...")
             else:
                 st.info("Noch keine Diskussionen gespeichert")
         
@@ -171,17 +186,31 @@ def main():
                     
                     for i, result in enumerate(search_results[:3]):  # Top 3 Ergebnisse
                         with st.expander(f"🔍 {result['topic'][:40]}..."):
-                            st.write(f"**Datum:** {result['timestamp'][:19]}")
-                            st.write(f"**Modelle:** {', '.join(result['models'])}")
+                            st.write(f"**📅 Datum:** {result['timestamp'][:19].replace('T', ' ')}")
+                            st.write(f"**🤖 Modelle:** {', '.join(result['models'])}")
+                            st.write(f"**🔢 DB-ID:** {result['id']}")
                             
-                            if st.button(f"📖 Laden", key=f"search_load_{i}"):
-                                # Vollständige Diskussion aus DB laden
-                                from database_manager import get_database
-                                db = get_database()
-                                full_discussion = db.load_discussion_with_messages(result['id'])
-                                if full_discussion:
-                                    st.session_state.loaded_discussion = full_discussion
-                                    st.rerun()
+                            # Buttons für Suchresultate
+                            col1, col2 = st.columns([2, 1])
+                            
+                            with col1:
+                                if st.button(f"📖 Laden", key=f"search_load_{i}", use_container_width=True):
+                                    # Vollständige Diskussion aus DB laden
+                                    from database_manager import get_database
+                                    db = get_database()
+                                    full_discussion = db.load_discussion_with_messages(result['id'])
+                                    if full_discussion:
+                                        st.session_state.loaded_discussion = full_discussion
+                                        st.success("Diskussion geladen!")
+                                        st.rerun()
+                            
+                            with col2:
+                                if st.button(f"🗑️ Löschen", key=f"search_delete_{i}", type="secondary", use_container_width=True):
+                                    if delete_discussion(result['id']):
+                                        st.success("Diskussion gelöscht!")
+                                        st.rerun()
+                                    else:
+                                        st.error("Fehler beim Löschen!")
                 else:
                     st.info("Keine Ergebnisse gefunden.")
         
