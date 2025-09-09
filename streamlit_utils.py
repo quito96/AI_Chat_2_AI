@@ -17,6 +17,7 @@ from agents import agent_dict
 from tasks import create_discussion_task, create_summary_task
 from utils import format_conversation
 from config import MAX_TURNS, AVAILABLE_MODELS
+from database_manager import get_database, sync_session_to_database, load_database_to_session
 
 
 class StreamlitDiscussionRunner:
@@ -250,11 +251,16 @@ def check_api_status() -> Dict[str, bool]:
 
 
 def save_discussion_to_session(topic: str, models: List[str], conversation: List[tuple], summary: str):
-    """Speichert Diskussion in Session State"""
+    """Speichert Diskussion in Session State und Datenbank"""
     if 'discussion_history' not in st.session_state:
         st.session_state.discussion_history = []
     
+    # In Datenbank speichern
+    db = get_database()
+    db_id = db.save_discussion(topic, models, conversation, summary)
+    
     discussion_entry = {
+        'db_id': db_id,
         'timestamp': datetime.now().isoformat(),
         'topic': topic,
         'models': models,
@@ -266,6 +272,44 @@ def save_discussion_to_session(topic: str, models: List[str], conversation: List
 
 
 def load_discussion_history() -> List[Dict[str, Any]]:
-    """Lädt Diskussionshistorie aus Session State"""
+    """Lädt Diskussionshistorie aus Session State und Datenbank"""
+    # Beim ersten Laden: Datenbank in Session State laden
+    if 'discussion_history' not in st.session_state:
+        load_database_to_session()
+    
     return st.session_state.get('discussion_history', [])
+
+
+def delete_discussion(discussion_id: int) -> bool:
+    """Löscht eine Diskussion aus Datenbank und Session State"""
+    db = get_database()
+    
+    # Aus Datenbank löschen
+    if db.delete_discussion(discussion_id):
+        # Aus Session State entfernen
+        if 'discussion_history' in st.session_state:
+            st.session_state.discussion_history = [
+                disc for disc in st.session_state.discussion_history 
+                if disc.get('db_id') != discussion_id
+            ]
+        return True
+    return False
+
+
+def search_discussions(search_term: str) -> List[Dict[str, Any]]:
+    """Sucht Diskussionen in der Datenbank"""
+    db = get_database()
+    return db.search_discussions(search_term, limit=20)
+
+
+def get_discussion_statistics() -> Dict[str, Any]:
+    """Gibt Statistiken über gespeicherte Diskussionen zurück"""
+    db = get_database()
+    return db.get_statistics()
+
+
+def backup_discussions(backup_path: str) -> bool:
+    """Erstellt ein Backup aller Diskussionen"""
+    db = get_database()
+    return db.backup_to_json(backup_path)
 

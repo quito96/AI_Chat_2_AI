@@ -12,7 +12,11 @@ from streamlit_utils import (
     get_discussion_templates,
     check_api_status,
     save_discussion_to_session,
-    load_discussion_history
+    load_discussion_history,
+    delete_discussion,
+    search_discussions,
+    get_discussion_statistics,
+    backup_discussions
 )
 from config import AVAILABLE_MODELS, MAX_TURNS, MAX_TOKENS
 
@@ -121,23 +125,89 @@ def main():
         )
     
     with col2:
-        # Diskussions-Historie
-        st.subheader("📚 Historie")
-        history = load_discussion_history()
+        # Diskussions-Historie & Management
+        st.subheader("📚 Diskussions-Management")
         
-        if history:
-            st.write(f"**{len(history)} Diskussionen gespeichert**")
+        # Tabs für verschiedene Funktionen
+        tab1, tab2, tab3 = st.tabs(["📜 Historie", "🔍 Suchen", "📊 Statistiken"])
+        
+        with tab1:
+            history = load_discussion_history()
             
-            # Letzte Diskussionen anzeigen
-            for i, entry in enumerate(reversed(history[-3:])):  # Letzte 3
-                with st.expander(f"💬 {entry['topic'][:30]}..."):
-                    st.write(f"**Datum:** {entry['timestamp'][:19]}")
-                    st.write(f"**Modelle:** {', '.join(entry['models'])}")
-                    if st.button(f"Laden", key=f"load_{i}"):
-                        st.session_state.loaded_discussion = entry
-                        st.rerun()
-        else:
-            st.info("Noch keine Diskussionen gespeichert")
+            if history:
+                st.write(f"**{len(history)} Diskussionen verfügbar**")
+                
+                # Letzte Diskussionen anzeigen
+                for i, entry in enumerate(reversed(history[-5:])):  # Letzte 5
+                    with st.expander(f"💬 {entry['topic'][:40]}..."):
+                        st.write(f"**Datum:** {entry['timestamp'][:19]}")
+                        st.write(f"**Modelle:** {', '.join(entry['models'])}")
+                        
+                        col_load, col_delete = st.columns([2, 1])
+                        with col_load:
+                            if st.button(f"📖 Laden", key=f"load_{i}"):
+                                st.session_state.loaded_discussion = entry
+                                st.rerun()
+                        
+                        with col_delete:
+                            if st.button(f"🗑️ Löschen", key=f"delete_{i}", type="secondary"):
+                                if delete_discussion(entry.get('db_id', 0)):
+                                    st.success("Diskussion gelöscht!")
+                                    st.rerun()
+                                else:
+                                    st.error("Fehler beim Löschen!")
+            else:
+                st.info("Noch keine Diskussionen gespeichert")
+        
+        with tab2:
+            # Suchfunktion
+            search_term = st.text_input("🔍 Diskussionen durchsuchen:", placeholder="Suchbegriff eingeben...")
+            
+            if search_term:
+                search_results = search_discussions(search_term)
+                
+                if search_results:
+                    st.write(f"**{len(search_results)} Ergebnisse gefunden:**")
+                    
+                    for i, result in enumerate(search_results[:3]):  # Top 3 Ergebnisse
+                        with st.expander(f"🔍 {result['topic'][:40]}..."):
+                            st.write(f"**Datum:** {result['timestamp'][:19]}")
+                            st.write(f"**Modelle:** {', '.join(result['models'])}")
+                            
+                            if st.button(f"📖 Laden", key=f"search_load_{i}"):
+                                # Vollständige Diskussion aus DB laden
+                                from database_manager import get_database
+                                db = get_database()
+                                full_discussion = db.load_discussion_with_messages(result['id'])
+                                if full_discussion:
+                                    st.session_state.loaded_discussion = full_discussion
+                                    st.rerun()
+                else:
+                    st.info("Keine Ergebnisse gefunden.")
+        
+        with tab3:
+            # Statistiken
+            try:
+                stats = get_discussion_statistics()
+                
+                st.metric("Gesamt Diskussionen", stats['total_discussions'])
+                st.metric("Gesamt Nachrichten", stats['total_messages'])
+                
+                if stats['latest_discussion']:
+                    st.write(f"**Neueste Diskussion:**")
+                    st.write(f"- {stats['latest_discussion']['topic'][:50]}...")
+                    st.write(f"- {stats['latest_discussion']['timestamp'][:19]}")
+                
+                # Backup-Funktion
+                if st.button("💾 Backup erstellen"):
+                    backup_path = f"discussions_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                    if backup_discussions(backup_path):
+                        st.success(f"Backup erstellt: {backup_path}")
+                    else:
+                        st.error("Fehler beim Backup!")
+                        
+            except Exception as e:
+                st.error(f"Fehler beim Laden der Statistiken: {e}")
     
     # Diskussion ausführen
     if start_discussion:
