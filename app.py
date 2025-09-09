@@ -78,7 +78,7 @@ def main():
         
         stream_mode = st.checkbox(
             "Streaming-Modus",
-            value=False,
+            value=True,
             help="Zeigt Antworten Wort für Wort an (langsamer)"
         )
         
