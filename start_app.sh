@@ -30,3 +30,4 @@ uv run streamlit run app.py
 
 echo ""
 echo "👋 App wurde beendet. Auf Wiedersehen!"
+

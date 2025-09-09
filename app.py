@@ -182,7 +182,7 @@ def run_discussion(topic: str, selected_models: List[str], max_turns: int, strea
     
     with st.spinner("Diskussion wird gestartet..."):
         conversation, summary = runner.run_discussion_with_updates(
-            topic, selected_models, progress_container, chat_container, stream_mode
+            topic, selected_models, progress_container, chat_container, stream_mode, max_turns
         )
     
     if conversation and summary:
@@ -279,3 +279,4 @@ def display_loaded_discussion(discussion: Dict, show_full: bool):
 
 if __name__ == "__main__":
     main()
+

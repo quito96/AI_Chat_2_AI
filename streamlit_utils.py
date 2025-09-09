@@ -33,7 +33,8 @@ class StreamlitDiscussionRunner:
         selected_models: List[str], 
         progress_container,
         chat_container,
-        stream_mode: bool = False
+        stream_mode: bool = False,
+        max_turns: int = MAX_TURNS
     ):
         """Führt Diskussion mit Live-Updates durch"""
         
@@ -50,10 +51,10 @@ class StreamlitDiscussionRunner:
         
         # Tasks erstellen
         tasks = []
-        total_tasks = MAX_TURNS * len(selected_models)
+        total_tasks = max_turns * len(selected_models)
         
         try:
-            for turn in range(1, MAX_TURNS + 1):
+            for turn in range(1, max_turns + 1):
                 for i in range(len(selected_models)):
                     current_agent = agent_dict[selected_models[i]]
                     next_agent = agent_dict[selected_models[(i + 1) % len(selected_models)]]
@@ -79,7 +80,8 @@ class StreamlitDiscussionRunner:
                 # Progress Update
                 progress = (i + 1) / len(results.tasks_output)
                 progress_bar.progress(progress)
-                status_text.text(f"💬 {agent.role} antwortet... ({i + 1}/{len(results.tasks_output)})")
+                current_turn = (i // len(selected_models)) + 1
+                status_text.text(f"💬 Turn {current_turn}/{max_turns}: {agent.role} antwortet... ({i + 1}/{len(results.tasks_output)})")
                 
                 # Chat Update
                 if stream_mode:
@@ -266,3 +268,4 @@ def save_discussion_to_session(topic: str, models: List[str], conversation: List
 def load_discussion_history() -> List[Dict[str, Any]]:
     """Lädt Diskussionshistorie aus Session State"""
     return st.session_state.get('discussion_history', [])
+
