@@ -22,7 +22,7 @@ from config import AVAILABLE_MODELS, MAX_TURNS, MAX_TOKENS
 
 # Streamlit Konfiguration
 st.set_page_config(
-    page_title="AI Multi-Model Discussion",
+    page_title="🤖 AI Diskussion",
     page_icon="🤖",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -125,33 +125,32 @@ def main():
         )
     
     with col2:
-        # Hinweis auf separate Management-Seite
-        st.subheader("📚 Diskussions-Management")
-        st.info("🔗 **Vollständiges Management**: Besuchen Sie die separate [Diskussions-Management Seite](pages/1_📚_Diskussions_Management.py) für erweiterte Funktionen.")
+        # API Status
+        st.subheader("🔗 API Status")
+        api_status = check_api_status()
         
-        # Schnelle Historie-Übersicht
-        with st.expander("📜 Letzte Diskussionen (Schnellübersicht)", expanded=True):
-            history = load_discussion_history()
-            
-            if history:
-                st.caption(f"**{len(history)} Diskussionen gespeichert** - Vollständige Übersicht in der Management-Seite")
-                
+        for model, status in api_status.items():
+            if status:
+                st.success(f"✅ {model.title()} verfügbar")
+            else:
+                st.error(f"❌ {model.title()} nicht verfügbar")
+        
+        # Schnelle Historie-Übersicht (falls Diskussionen vorhanden)
+        history = load_discussion_history()
+        if history:
+            with st.expander(f"📜 Letzte Diskussionen ({len(history)} gespeichert)", expanded=False):
                 # Nur die letzten 3 anzeigen
                 for i, entry in enumerate(reversed(history[-3:])):
-                    topic_preview = entry['topic'][:40] + "..." if len(entry['topic']) > 40 else entry['topic']
-                    date_str = entry['timestamp'][:19].replace('T', ' ')
+                    topic_preview = entry['topic'][:35] + "..." if len(entry['topic']) > 35 else entry['topic']
+                    date_str = entry['timestamp'][:16].replace('T', ' ')
                     
                     col1, col2 = st.columns([4, 1])
                     with col1:
-                        st.write(f"💬 **{topic_preview}** - {date_str}")
+                        st.caption(f"💬 {topic_preview} - {date_str}")
                     with col2:
                         if st.button(f"📖", key=f"quick_load_{i}", help="Diskussion laden", use_container_width=True):
                             st.session_state.loaded_discussion = entry
                             st.rerun()
-            else:
-                st.write("Noch keine Diskussionen gespeichert")
-        
-        # Management-Code wurde auf separate Seite verschoben
     
     # Diskussion ausführen
     if start_discussion:

@@ -26,7 +26,7 @@ echo "🔄 Synchronisiere Abhängigkeiten..."
 uv sync --quiet
 
 echo "🎨 Starte Streamlit App..."
-uv run streamlit run app.py
+uv run streamlit run 🤖_AI_Diskussion.py
 
 echo ""
 echo "👋 App wurde beendet. Auf Wiedersehen!"

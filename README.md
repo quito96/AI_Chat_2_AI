@@ -69,7 +69,7 @@ Start the interactive Streamlit web application:
 
 **Option 2: Direct command**
 ```bash
-uv run streamlit run app.py
+uv run streamlit run 🤖_AI_Diskussion.py
 ```
 
 The app will be available at: **http://localhost:8588**
@@ -95,8 +95,12 @@ uv run python main.py
 - Check available OpenAI models: `uv run python utils/get_openai_models.py`
 
 ## Project Structure
-- `app.py`: **🆕 Streamlit web application** (main interface)
+- `🤖_AI_Diskussion.py`: **🆕 Main Streamlit application** (discussion interface)
+- `pages/`: **🆕 Additional Streamlit pages**
+  - `1_📚_Diskussions_Management.py`: Discussion management interface
 - `streamlit_utils.py`: **🆕 Streamlit-specific utilities and helpers**
+- `database_manager.py`: **🆕 SQLite database management**
+- `agent_metadata.py`: **🆕 Agent metadata for transparency**
 - `main.py`: Command-line interface (CLI)
 - `agents.py`: AI agent definitions (ChatGPT, Claude, Gemini, Granite)
 - `tasks.py`: Discussion and summary task definitions
