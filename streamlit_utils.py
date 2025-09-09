@@ -96,7 +96,11 @@ class StreamlitDiscussionRunner:
             status_text.text("📋 Zusammenfassung wird erstellt...")
             formatted_conversation = format_conversation(self.conversation)
             
-            summary_task = create_summary_task(agent_dict[selected_models[0]], topic, formatted_conversation)
+            # Teilnehmer-Informationen für Transparenz
+            from agent_metadata import format_agents_for_summary
+            participants_info = format_agents_for_summary(selected_models)
+            
+            summary_task = create_summary_task(agent_dict[selected_models[0]], topic, formatted_conversation, participants_info)
             summary_crew = Crew(
                 agents=[agent_dict[selected_models[0]]],
                 tasks=[summary_task],
@@ -255,9 +259,13 @@ def save_discussion_to_session(topic: str, models: List[str], conversation: List
     if 'discussion_history' not in st.session_state:
         st.session_state.discussion_history = []
     
+    # Modell-Metadaten erfassen
+    from agent_metadata import get_all_agents_metadata
+    models_metadata = get_all_agents_metadata(models)
+    
     # In Datenbank speichern
     db = get_database()
-    db_id = db.save_discussion(topic, models, conversation, summary)
+    db_id = db.save_discussion(topic, models, conversation, summary, models_metadata)
     
     discussion_entry = {
         'db_id': db_id,

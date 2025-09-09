@@ -170,7 +170,21 @@ def main():
                         with col3:
                             # Info-Button für Details
                             if st.button(f"ℹ️ Info", key=f"info_hist_{i}", use_container_width=True):
-                                st.info(f"**Diskussion Details:**\n- Turns: {len(entry.get('conversation', []))}\n- Zusammenfassung: {entry.get('summary', 'Keine')[:100]}...")
+                                # Erweiterte Informationen anzeigen
+                                from agent_metadata import get_all_agents_metadata, format_technical_details
+                                
+                                turns_count = len(entry.get('conversation', []))
+                                summary_preview = entry.get('summary', 'Keine')[:100] + "..." if len(entry.get('summary', '')) > 100 else entry.get('summary', 'Keine')
+                                
+                                # Technische Details der verwendeten Modelle
+                                tech_details = format_technical_details(entry['models'])
+                                
+                                st.info(f"""**📊 Diskussion Details:**
+- **🔢 Anzahl Turns**: {turns_count}
+- **📝 Zusammenfassung**: {summary_preview}
+
+{tech_details}
+                                """)
             else:
                 st.info("Noch keine Diskussionen gespeichert")
         
@@ -289,16 +303,23 @@ def run_discussion(topic: str, selected_models: List[str], max_turns: int, strea
         save_discussion_to_session(topic, selected_models, conversation, summary)
         
         # Ergebnisse anzeigen
-        display_results(topic, conversation, summary, show_full)
+        display_results(topic, conversation, summary, show_full, selected_models)
     else:
         st.error("Diskussion konnte nicht durchgeführt werden.")
 
 
-def display_results(topic: str, conversation: List[tuple], summary: str, show_full: bool):
+def display_results(topic: str, conversation: List[tuple], summary: str, show_full: bool, selected_models: List[str] = None):
     """Zeigt Diskussionsergebnisse an"""
     
     st.divider()
     st.subheader("📋 Ergebnisse")
+    
+    # Technische Details anzeigen
+    if selected_models:
+        with st.expander("🔧 Technische Details der verwendeten Modelle"):
+            from agent_metadata import format_technical_details
+            tech_details = format_technical_details(selected_models)
+            st.markdown(tech_details)
     
     # Tabs für verschiedene Ansichten
     tab1, tab2, tab3 = st.tabs(["📄 Zusammenfassung", "💬 Diskussion", "📥 Export"])

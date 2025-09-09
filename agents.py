@@ -54,7 +54,7 @@ if GOOGLE_CREDENTIALS:
         allow_delegation=False,
         llm_config={
             "provider": "google",
-            "model": "gemini-1.5-flash",  # gemini-1.5-flash, gemini-pro
+            "model": "gemini-2.5-flash",  # gemini-1.5-flash, gemini-pro
             "credentials": GOOGLE_CREDENTIALS,
             "temperature": 0.7,
             "max_tokens": MAX_TOKENS

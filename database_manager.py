@@ -32,6 +32,7 @@ class DiscussionDatabase:
                     timestamp TEXT NOT NULL,
                     topic TEXT NOT NULL,
                     models TEXT NOT NULL,  -- JSON array
+                    models_metadata TEXT,  -- JSON array with detailed model info
                     summary TEXT NOT NULL,
                     total_turns INTEGER NOT NULL,
                     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
@@ -65,7 +66,7 @@ class DiscussionDatabase:
             
             conn.commit()
     
-    def save_discussion(self, topic: str, models: List[str], conversation: List[Tuple[str, str]], summary: str) -> int:
+    def save_discussion(self, topic: str, models: List[str], conversation: List[Tuple[str, str]], summary: str, models_metadata: List[Dict] = None) -> int:
         """
         Speichert eine Diskussion in der Datenbank
         
@@ -84,10 +85,11 @@ class DiscussionDatabase:
             cursor = conn.cursor()
             
             # Hauptdiskussion speichern
+            models_metadata_json = json.dumps(models_metadata) if models_metadata else None
             cursor.execute('''
-                INSERT INTO discussions (timestamp, topic, models, summary, total_turns)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (timestamp, topic, json.dumps(models), summary, len(conversation)))
+                INSERT INTO discussions (timestamp, topic, models, models_metadata, summary, total_turns)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (timestamp, topic, json.dumps(models), models_metadata_json, summary, len(conversation)))
             
             discussion_id = cursor.lastrowid
             

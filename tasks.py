@@ -12,17 +12,19 @@ def create_discussion_task(agent, other_agent, topic, turn):
                         f"continuing the discussion on the given topic."
     )
 
-def create_summary_task(agent, topic, conversation):
+def create_summary_task(agent, topic, conversation, participants_info: str = ""):
     return Task(
         description=f"Summarize the discussion on '{topic}' and provide a conclusion. "
                     f"Consider the following points:\n"
-                    f"1. Summarize the main arguments and insights from both participants.\n"
-                    f"2. Identify key agreements and potential differences in viewpoints.\n"
-                    f"3. Create a structured summary of the key points.\n"
-                    f"4. Formulate a joint conclusion that captures the essence of the discussion.\n"
-                    f"5. Keep the summary concise and to the point.\n"
+                    f"1. Start with the participants information: {participants_info}\n"
+                    f"2. Summarize the main arguments and insights from each participant by name.\n"
+                    f"3. Identify key agreements and potential differences in viewpoints.\n"
+                    f"4. Create a structured summary of the key points.\n"
+                    f"5. Formulate a joint conclusion that captures the essence of the discussion.\n"
+                    f"6. Keep the summary concise and to the point.\n"
                     f"Here's the conversation: {conversation}",
         agent=agent,
-        expected_output="A structured, concise summary of the discussion with a clear, "
-                        "joint conclusion. Important: Answer in the language of the discussion topic."
+        expected_output="A structured, concise summary of the discussion starting with participant details, "
+                        "clearly naming each AI model/participant in the analysis, and ending with a joint conclusion. "
+                        "Important: Answer in the language of the discussion topic."
     )
