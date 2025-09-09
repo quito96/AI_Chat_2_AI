@@ -174,12 +174,12 @@ def run_discussion(topic: str, selected_models: List[str], max_turns: int, strea
         save_discussion_to_session(topic, selected_models, conversation, summary)
         
         # Ergebnisse anzeigen
-        display_results(topic, conversation, summary, show_full, selected_models)
+        display_results(topic, conversation, summary, show_full, selected_models, key_prefix="new_")
     else:
         st.error("Diskussion konnte nicht durchgeführt werden.")
 
 
-def display_results(topic: str, conversation: List[tuple], summary: str, show_full: bool, selected_models: List[str] = None):
+def display_results(topic: str, conversation: List[tuple], summary: str, show_full: bool, selected_models: List[str] = None, key_prefix: str = ""):
     """Zeigt Diskussionsergebnisse an"""
     
     st.divider()
@@ -234,7 +234,8 @@ def display_results(topic: str, conversation: List[tuple], summary: str, show_fu
                 label="📄 Als Markdown herunterladen",
                 data=md_content,
                 file_name=f"diskussion_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
-                mime="text/markdown"
+                mime="text/markdown",
+                key=f"{key_prefix}download_md"
             )
         
         with col2:
@@ -246,7 +247,8 @@ def display_results(topic: str, conversation: List[tuple], summary: str, show_fu
                 label="📑 Als PDF herunterladen",
                 data=pdf_bytes,
                 file_name=f"diskussion_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
-                mime="application/pdf"
+                mime="application/pdf",
+                key=f"{key_prefix}download_pdf"
             )
 
 
@@ -264,7 +266,9 @@ def display_loaded_discussion(discussion: Dict, show_full: bool):
         discussion['topic'], 
         discussion['conversation'], 
         discussion['summary'], 
-        show_full
+        show_full,
+        discussion['models'],
+        key_prefix="loaded_"
     )
 
 
