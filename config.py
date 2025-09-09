@@ -31,7 +31,7 @@ else:
 
 # Configuration settings
 MAX_TURNS = 5  # Maximum number of conversation rounds
-MAX_TOKENS = 2000  # Maximum number of tokens per response
+MAX_TOKENS = 4000  # Maximum number of tokens per response
 
 # List of available models (dynamically determined)
 AVAILABLE_MODELS = ["chatgpt", "claude", "granite"]

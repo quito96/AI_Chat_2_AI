@@ -335,8 +335,13 @@ class DiscussionDatabase:
 # Globale Datenbankinstanz
 @st.cache_resource
 def get_database() -> DiscussionDatabase:
-    """Erstellt oder gibt die globale Datenbankinstanz zurück"""
-    return DiscussionDatabase()
+    """
+    Holt die Datenbank-Instanz und stellt sicher, dass sie initialisiert ist.
+    Diese Funktion wird beim ersten Aufruf die Datenbank automatisch erstellen.
+    """
+    db = DiscussionDatabase()
+    db.init_database()  # Stellt sicher, dass Tabellen existieren
+    return db
 
 
 def sync_session_to_database():

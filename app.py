@@ -125,132 +125,33 @@ def main():
         )
     
     with col2:
-        # Diskussions-Historie & Management
+        # Hinweis auf separate Management-Seite
         st.subheader("📚 Diskussions-Management")
+        st.info("🔗 **Vollständiges Management**: Besuchen Sie die separate [Diskussions-Management Seite](pages/1_📚_Diskussions_Management.py) für erweiterte Funktionen.")
         
-        # Tabs für verschiedene Funktionen
-        tab1, tab2, tab3 = st.tabs(["📜 Historie", "🔍 Suchen", "📊 Statistiken"])
-        
-        with tab1:
+        # Schnelle Historie-Übersicht
+        with st.expander("📜 Letzte Diskussionen (Schnellübersicht)", expanded=True):
             history = load_discussion_history()
             
             if history:
-                st.write(f"**{len(history)} Diskussionen verfügbar**")
+                st.caption(f"**{len(history)} Diskussionen gespeichert** - Vollständige Übersicht in der Management-Seite")
                 
-                # Letzte Diskussionen anzeigen
-                for i, entry in enumerate(reversed(history[-5:])):  # Letzte 5
-                    # Erweiterte Anzeige mit mehr Informationen
-                    topic_preview = entry['topic'][:50] + "..." if len(entry['topic']) > 50 else entry['topic']
+                # Nur die letzten 3 anzeigen
+                for i, entry in enumerate(reversed(history[-3:])):
+                    topic_preview = entry['topic'][:40] + "..." if len(entry['topic']) > 40 else entry['topic']
                     date_str = entry['timestamp'][:19].replace('T', ' ')
-                    models_str = ', '.join(entry['models'])
                     
-                    with st.expander(f"💬 {topic_preview}", expanded=False):
-                        st.write(f"**📅 Datum:** {date_str}")
-                        st.write(f"**🤖 Modelle:** {models_str}")
-                        st.write(f"**🔢 DB-ID:** {entry.get('db_id', 'Nicht verfügbar')}")
-                        
-                        # Buttons in separaten Spalten
-                        col1, col2, col3 = st.columns([2, 1, 1])
-                        
-                        with col1:
-                            if st.button(f"📖 Laden", key=f"load_hist_{i}", use_container_width=True):
-                                st.session_state.loaded_discussion = entry
-                                st.success(f"Diskussion '{entry['topic'][:30]}...' geladen!")
-                                st.rerun()
-                        
-                        with col2:
-                            if st.button(f"🗑️ Löschen", key=f"delete_hist_{i}", type="secondary", use_container_width=True):
-                                db_id = entry.get('db_id', 0)
-                                if db_id and delete_discussion(db_id):
-                                    st.success("Diskussion gelöscht!")
-                                    st.rerun()
-                                else:
-                                    st.error("Fehler beim Löschen!")
-                        
-                        with col3:
-                            # Info-Button für Details
-                            if st.button(f"ℹ️ Info", key=f"info_hist_{i}", use_container_width=True):
-                                # Erweiterte Informationen anzeigen
-                                from agent_metadata import get_all_agents_metadata, format_technical_details
-                                
-                                turns_count = len(entry.get('conversation', []))
-                                summary_preview = entry.get('summary', 'Keine')[:100] + "..." if len(entry.get('summary', '')) > 100 else entry.get('summary', 'Keine')
-                                
-                                # Technische Details der verwendeten Modelle
-                                tech_details = format_technical_details(entry['models'])
-                                
-                                st.info(f"""**📊 Diskussion Details:**
-- **🔢 Anzahl Turns**: {turns_count}
-- **📝 Zusammenfassung**: {summary_preview}
-
-{tech_details}
-                                """)
+                    col1, col2 = st.columns([4, 1])
+                    with col1:
+                        st.write(f"💬 **{topic_preview}** - {date_str}")
+                    with col2:
+                        if st.button(f"📖", key=f"quick_load_{i}", help="Diskussion laden", use_container_width=True):
+                            st.session_state.loaded_discussion = entry
+                            st.rerun()
             else:
-                st.info("Noch keine Diskussionen gespeichert")
+                st.write("Noch keine Diskussionen gespeichert")
         
-        with tab2:
-            # Suchfunktion
-            search_term = st.text_input("🔍 Diskussionen durchsuchen:", placeholder="Suchbegriff eingeben...")
-            
-            if search_term:
-                search_results = search_discussions(search_term)
-                
-                if search_results:
-                    st.write(f"**{len(search_results)} Ergebnisse gefunden:**")
-                    
-                    for i, result in enumerate(search_results[:3]):  # Top 3 Ergebnisse
-                        with st.expander(f"🔍 {result['topic'][:40]}..."):
-                            st.write(f"**📅 Datum:** {result['timestamp'][:19].replace('T', ' ')}")
-                            st.write(f"**🤖 Modelle:** {', '.join(result['models'])}")
-                            st.write(f"**🔢 DB-ID:** {result['id']}")
-                            
-                            # Buttons für Suchresultate
-                            col1, col2 = st.columns([2, 1])
-                            
-                            with col1:
-                                if st.button(f"📖 Laden", key=f"search_load_{i}", use_container_width=True):
-                                    # Vollständige Diskussion aus DB laden
-                                    from database_manager import get_database
-                                    db = get_database()
-                                    full_discussion = db.load_discussion_with_messages(result['id'])
-                                    if full_discussion:
-                                        st.session_state.loaded_discussion = full_discussion
-                                        st.success("Diskussion geladen!")
-                                        st.rerun()
-                            
-                            with col2:
-                                if st.button(f"🗑️ Löschen", key=f"search_delete_{i}", type="secondary", use_container_width=True):
-                                    if delete_discussion(result['id']):
-                                        st.success("Diskussion gelöscht!")
-                                        st.rerun()
-                                    else:
-                                        st.error("Fehler beim Löschen!")
-                else:
-                    st.info("Keine Ergebnisse gefunden.")
-        
-        with tab3:
-            # Statistiken
-            try:
-                stats = get_discussion_statistics()
-                
-                st.metric("Gesamt Diskussionen", stats['total_discussions'])
-                st.metric("Gesamt Nachrichten", stats['total_messages'])
-                
-                if stats['latest_discussion']:
-                    st.write(f"**Neueste Diskussion:**")
-                    st.write(f"- {stats['latest_discussion']['topic'][:50]}...")
-                    st.write(f"- {stats['latest_discussion']['timestamp'][:19]}")
-                
-                # Backup-Funktion
-                if st.button("💾 Backup erstellen"):
-                    backup_path = f"discussions_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-                    if backup_discussions(backup_path):
-                        st.success(f"Backup erstellt: {backup_path}")
-                    else:
-                        st.error("Fehler beim Backup!")
-                        
-            except Exception as e:
-                st.error(f"Fehler beim Laden der Statistiken: {e}")
+        # Management-Code wurde auf separate Seite verschoben
     
     # Diskussion ausführen
     if start_discussion:
