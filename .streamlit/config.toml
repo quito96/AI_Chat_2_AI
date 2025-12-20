@@ -2,7 +2,7 @@
 developmentMode = false
 
 [server]
-port = 8588
+port = 8577
 enableCORS = false
 enableXsrfProtection = false
 

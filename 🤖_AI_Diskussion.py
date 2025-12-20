@@ -22,17 +22,61 @@ from config import AVAILABLE_MODELS, MAX_TURNS, MAX_TOKENS
 
 # Streamlit Konfiguration
 st.set_page_config(
-    page_title="🤖 AI Diskussion",
-    page_icon="🤖",
+    page_title="🤖AI Diskussion",
+    page_icon="assets/favicon.png",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 def main():
     """Hauptfunktion der Streamlit App"""
-    
-    # Header
-    st.title("🤖 AI Multi-Model Discussion System")
+
+    # Header mit Logo - Theme-abhängig
+    import base64
+    from pathlib import Path
+
+    # SVGs als base64 einlesen
+    def get_svg_base64(svg_path):
+        with open(svg_path, "r") as f:
+            return base64.b64encode(f.read().encode()).decode()
+
+    svg_light = get_svg_base64("assets/ai2ai_chat.svg")
+    svg_dark = get_svg_base64("assets/ai2ai_chat_white.svg")
+
+    st.markdown(f"""
+        <style>
+        /* Light mode */
+        @media (prefers-color-scheme: light) {{
+            .logo-dark {{ display: none !important; }}
+            .logo-light {{ display: block !important; }}
+        }}
+
+        /* Dark mode */
+        @media (prefers-color-scheme: dark) {{
+            .logo-light {{ display: none !important; }}
+            .logo-dark {{ display: block !important; }}
+        }}
+
+        /* Streamlit theme detection */
+        [data-theme="light"] .logo-dark {{ display: none !important; }}
+        [data-theme="light"] .logo-light {{ display: block !important; }}
+        [data-theme="dark"] .logo-light {{ display: none !important; }}
+        [data-theme="dark"] .logo-dark {{ display: block !important; }}
+        </style>
+    """, unsafe_allow_html=True)
+
+    col1, col2 = st.columns([1, 10])
+    with col1:
+        st.markdown(f"""
+            <div class="logo-light">
+                <img src="data:image/svg+xml;base64,{svg_light}" width="120" style="max-width: 100%;">
+            </div>
+            <div class="logo-dark">
+                <img src="data:image/svg+xml;base64,{svg_dark}" width="120" style="max-width: 100%;">
+            </div>
+        """, unsafe_allow_html=True)
+    with col2:
+        st.title("AI Multi-Model Discussion System")
     st.markdown("*Lassen Sie verschiedene KI-Modelle über Ihr Thema diskutieren*")
     
     # Sidebar - Konfiguration
