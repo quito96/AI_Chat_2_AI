@@ -31,48 +31,80 @@ st.set_page_config(
 def main():
     """Hauptfunktion der Streamlit App"""
 
-    # Header mit Logo - Theme-abhängig
+    # Header mit Logo - Theme-abhängig (PNG-Versionen)
     import base64
-    from pathlib import Path
 
-    # SVGs als base64 einlesen
-    def get_svg_base64(svg_path):
-        with open(svg_path, "r") as f:
-            return base64.b64encode(f.read().encode()).decode()
+    # PNGs als base64 einlesen
+    def get_image_base64(img_path):
+        with open(img_path, "rb") as f:
+            return base64.b64encode(f.read()).decode()
 
-    svg_light = get_svg_base64("assets/ai2ai_chat.svg")
-    svg_dark = get_svg_base64("assets/ai2ai_chat_white.svg")
+    png_light = get_image_base64("assets/ai2ai_chat.png")  # Schwarze Linien für Light Mode
+    png_dark = get_image_base64("assets/ai2ai_chat_white.png")  # Weiße Linien für Dark Mode
 
     st.markdown(f"""
         <style>
-        /* Light mode */
-        @media (prefers-color-scheme: light) {{
-            .logo-dark {{ display: none !important; }}
-            .logo-light {{ display: block !important; }}
+        .logo-container {{
+            position: relative;
+            width: 120px;
+            height: auto;
         }}
-
-        /* Dark mode */
-        @media (prefers-color-scheme: dark) {{
-            .logo-light {{ display: none !important; }}
-            .logo-dark {{ display: block !important; }}
+        .logo-light, .logo-dark {{
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: opacity 0.3s ease;
+            width: 100%;
         }}
-
-        /* Streamlit theme detection */
-        [data-theme="light"] .logo-dark {{ display: none !important; }}
-        [data-theme="light"] .logo-light {{ display: block !important; }}
-        [data-theme="dark"] .logo-light {{ display: none !important; }}
-        [data-theme="dark"] .logo-dark {{ display: block !important; }}
         </style>
+
+        <script>
+        function updateLogo() {{
+            const lightLogo = document.querySelector('.logo-light');
+            const darkLogo = document.querySelector('.logo-dark');
+
+            if (!lightLogo || !darkLogo) return;
+
+            // Check Streamlit theme from body background color
+            const bgColor = window.getComputedStyle(document.body).backgroundColor;
+            const rgb = bgColor.match(/\\d+/g);
+
+            if (rgb) {{
+                const brightness = (parseInt(rgb[0]) * 299 + parseInt(rgb[1]) * 587 + parseInt(rgb[2]) * 114) / 1000;
+
+                if (brightness > 128) {{
+                    // Light mode
+                    lightLogo.style.opacity = '1';
+                    darkLogo.style.opacity = '0';
+                }} else {{
+                    // Dark mode
+                    lightLogo.style.opacity = '0';
+                    darkLogo.style.opacity = '1';
+                }}
+            }}
+        }}
+
+        // Initial check
+        setTimeout(updateLogo, 100);
+
+        // Check periodically for theme changes
+        setInterval(updateLogo, 500);
+
+        // Also check on visibility change
+        document.addEventListener('visibilitychange', updateLogo);
+        </script>
     """, unsafe_allow_html=True)
 
     col1, col2 = st.columns([1, 10])
     with col1:
         st.markdown(f"""
-            <div class="logo-light">
-                <img src="data:image/svg+xml;base64,{svg_light}" width="120" style="max-width: 100%;">
-            </div>
-            <div class="logo-dark">
-                <img src="data:image/svg+xml;base64,{svg_dark}" width="120" style="max-width: 100%;">
+            <div class="logo-container">
+                <div class="logo-light">
+                    <img src="data:image/png;base64,{png_light}" width="120" style="max-width: 100%;">
+                </div>
+                <div class="logo-dark">
+                    <img src="data:image/png;base64,{png_dark}" width="120" style="max-width: 100%;">
+                </div>
             </div>
         """, unsafe_allow_html=True)
     with col2:
