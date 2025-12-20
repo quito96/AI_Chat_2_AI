@@ -1,16 +1,18 @@
 # agents.py
 from crewai import Agent,LLM
-from config import OPENAI_API_KEY, ANTHROPIC_API_KEY, GOOGLE_CREDENTIALS, MAX_TOKENS
+from config import OPENAI_API_KEY, ANTHROPIC_API_KEY, GOOGLE_CREDENTIALS, MAX_TOKENS, OLLAMA_BASE_URL
 
 
-### language:python
-granite_agent = Agent(
-    role='Granite',
-    goal='Participate in a constructive dialogue and offer unique perspectives.',
-    backstory="You are Granite, an AI assistant created by IBM.",
-    verbose=True,
-    allow_delegation=False,
-    llm=LLM(model="ollama/granite3-dense:8b", base_url="http://localhost:11434")
+# Granite agent - only create if Ollama is available
+granite_agent = None
+if OLLAMA_BASE_URL:
+    granite_agent = Agent(
+        role='Granite',
+        goal='Participate in a constructive dialogue and offer unique perspectives.',
+        backstory="You are Granite, an AI assistant created by IBM.",
+        verbose=True,
+        allow_delegation=False,
+        llm=LLM(model="ollama/granite3-dense:8b", base_url=OLLAMA_BASE_URL)
     )
 
 chatgpt_agent = Agent(
@@ -64,9 +66,12 @@ if GOOGLE_CREDENTIALS:
 # Dictionary to easily access agents by name
 agent_dict = {
     "chatgpt": chatgpt_agent,
-    "claude": claude_agent,
-    "granite": granite_agent
+    "claude": claude_agent
 }
+
+# Add Granite only if available
+if granite_agent:
+    agent_dict["granite"] = granite_agent
 
 # Add Gemini only if available
 if gemini_agent:

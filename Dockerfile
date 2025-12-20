@@ -32,5 +32,8 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 # Streamlit Configuration
 ENV STREAMLIT_SERVER_HEADLESS=true
 
+# Disable CrewAI Telemetry to avoid signal handler warnings
+ENV OTEL_SDK_DISABLED=true
+
 # Start command (port loaded from .streamlit/config.toml)
 CMD ["streamlit", "run", "🤖_AI_Diskussion.py"]

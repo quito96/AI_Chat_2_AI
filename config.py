@@ -29,12 +29,22 @@ if GOOGLE_CREDENTIALS_PATH and os.path.exists(GOOGLE_CREDENTIALS_PATH):
 else:
     print("Warning: Google Credentials path not found. Gemini will not be available.")
 
+# Ollama configuration (optional for Granite)
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL")  # e.g., "http://localhost:11434"
+
 # Configuration settings
 MAX_TURNS = 5  # Maximum number of conversation rounds
 MAX_TOKENS = 4000  # Maximum number of tokens per response
 
 # List of available models (dynamically determined)
-AVAILABLE_MODELS = ["chatgpt", "claude", "granite"]
+AVAILABLE_MODELS = ["chatgpt", "claude"]
+
+# Add Granite if Ollama is available
+if OLLAMA_BASE_URL:
+    AVAILABLE_MODELS.append("granite")
+    print(f"Ollama available at {OLLAMA_BASE_URL}. Granite model enabled.")
+else:
+    print("Warning: OLLAMA_BASE_URL not set. Granite model will not be available.")
 
 # Add Gemini if credentials are available
 if GOOGLE_CREDENTIALS:
