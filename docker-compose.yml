@@ -1,0 +1,54 @@
+services:
+  ai-discussion:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-discussion-app
+    ports:
+      - "8577:8577"
+    volumes:
+      # Code-Volumes für Live-Entwicklung (optional)
+      - ./🤖_AI_Diskussion.py:/app/🤖_AI_Diskussion.py
+      - ./agents.py:/app/agents.py
+      - ./config.py:/app/config.py
+      - ./streamlit_utils.py:/app/streamlit_utils.py
+      - ./utils.py:/app/utils.py
+      - ./tasks.py:/app/tasks.py
+      - ./database_manager.py:/app/database_manager.py
+      - ./agent_metadata.py:/app/agent_metadata.py
+
+      # Assets und statische Dateien
+      - ./assets:/app/assets
+      - ./.streamlit:/app/.streamlit
+
+      # Persistente Daten
+      - ./data:/app/data
+      - ./discussions.db:/app/discussions.db
+
+      # Credentials vom Host laden (read-only)
+      - ./cred/gemini-ai-api-c3dd7075f39d.json:/app/credentials.json:ro
+      - ./.env:/app/.env:ro
+
+    environment:
+      # Umgebungsvariablen aus .env werden automatisch geladen
+      - GOOGLE_CREDENTIALS_PATH=/app/credentials.json
+      - PYTHONUNBUFFERED=1
+
+    env_file:
+      - .env
+
+    restart: unless-stopped
+
+    networks:
+      - ai-network
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8577/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  ai-network:
+    driver: bridge
